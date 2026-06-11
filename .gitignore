@@ -1,0 +1,20 @@
+# IDE (IntelliJ)
+.idea/
+*.iml
+
+# Maven & Java
+target/
+*.class
+
+# Arquivos de Log
+*.log
+
+# Resultados do JMH Benchmark
+# Ignora as planilhas e jsons gerados pelos testes
+*.csv
+*.json
+jmh-result.*
+
+# Sistema Operacional
+.DS_Store
+Thumbs.db
