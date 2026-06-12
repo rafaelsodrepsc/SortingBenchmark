@@ -47,10 +47,10 @@ import java.util.concurrent.TimeUnit;
  *   fork reduz variabilidade entre execucoes mas aumenta o tempo total.
  */
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-@Warmup(iterations = 1, time = 1, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 2, time = 1, timeUnit = TimeUnit.SECONDS)
+@Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 15, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class SortingBenchmark {
 
@@ -59,7 +59,7 @@ public class SortingBenchmark {
      *   gerando combinacoes automaticas com outros @Param. Aqui define os tres
      *   tamanhos de vetor exigidos pelo enunciado.
      */
-    @Param({"10", "50", "100"})
+    @Param({"1000", "5000", "10000"})
     private int tamanho;
 
     /**
@@ -205,8 +205,8 @@ public class SortingBenchmark {
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(SortingBenchmark.class.getSimpleName())
-                .resultFormat(org.openjdk.jmh.results.format.ResultFormatType.JSON) // Mude para JSON
-                .result("resultados.json")                                          // Mude a extensão
+                .resultFormat(org.openjdk.jmh.results.format.ResultFormatType.JSON) // formato de resposta em JSON
+                .result("resultados.json")
                 .build();
         new Runner(opt).run();
     }
