@@ -191,7 +191,7 @@ O JMH executa automaticamente todas as combinações dos parâmetros abaixo:
 
 | Parâmetro | Valores |
 |-----------|---------|
-| `tamanho` | `1000`, `5000`, `10000` |
+| `tamanho` | `1000`, `15000`, `50000` |
 | `cenario` | `RANDOM`, `SORTED`, `REVERSED` |
 
 **Configuração de medição:**
