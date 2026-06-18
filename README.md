@@ -76,8 +76,8 @@ mvn -version
 ### 3. Clonar o repositório
 
 ```bash
-git clone https://github.com/rafaelsodrepsc/ProjetoEdaLeda.git
-cd ProjetoEdaLeda
+git clone https://github.com/rafaelsodrepsc/SortingBenchmark.git
+cd SortingBenchmark
 ```
 
 ### 4. Baixar dependências e compilar
