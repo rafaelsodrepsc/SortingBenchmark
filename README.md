@@ -1,4 +1,4 @@
-# EDA/LEDA — Benchmark de Algoritmos de Ordenação e Busca
+# EDA/LEDA - Benchmark de Algoritmos de Ordenação e Busca
 
 Projeto acadêmico desenvolvido na **UEPB** para a disciplina de Estrutura de Dados e Algoritmos (EDA/LEDA). Implementa e mede o desempenho de algoritmos de ordenação e busca sobre um array de objetos `Estudante`, usando o framework de microbenchmark **JMH (Java Microbenchmark Harness)**.
 
@@ -76,8 +76,8 @@ mvn -version
 ### 3. Clonar o repositório
 
 ```bash
-git clone https://github.com/rafaelsodrepsc/ProjetoEdaLeda.git
-cd ProjetoEdaLeda
+git clone https://github.com/rafaelsodrepsc/SortingBenchmark.git
+cd SortingBenchmark
 ```
 
 ### 4. Baixar dependências e compilar
@@ -96,9 +96,10 @@ Esse comando:
 ## Estrutura do projeto
 
 ```
-ProjetoEdaLeda/
+SortingBenchmark/
 ├── pom.xml                          # Configuração Maven + JMH
-├── resultados.json                  # Saída dos benchmarks (gerado ao executar)
+├── resultados.json                  # Saída do benchmark de ordenação (gerado ao executar)
+├── resultados_busca.json            # Saída do benchmark de busca (gerado ao executar)
 └── src/
     ├── main/java/br/edu/uepb/eda/
     │   ├── model/
@@ -110,11 +111,14 @@ ProjetoEdaLeda/
     │   │   ├── MergeSort.java       # Clássico + TimSort (Java)
     │   │   ├── QuickSort.java       # Slide + Shuffle + Java Dual-Pivot
     │   │   └── CountingSort.java
+    │   ├── search/
+    │   │   └── SearchAlgorithms.java # Buscas linear (3) e binária (2)
     │   └── util/
     │       └── DataGenerator.java   # Gerador de dados: RANDOM, SORTED, REVERSED
     └── test/java/br/edu/uepb/eda/
         └── benchmark/
-            └── SortingBenchmark.java  # Classe principal do JMH
+            ├── SortingBenchmark.java  # Benchmark JMH de ordenação
+            └── SearchBenchmark.java   # Benchmark JMH de busca
 ```
 
 ---
@@ -129,13 +133,13 @@ ProjetoEdaLeda/
 | BubbleSort | Otimizado (flag) | O(n²) / O(n) melhor | Sim |
 | SelectionSort | Slide | O(n²) | Não |
 | SelectionSort | Estável | O(n²) | Sim |
-| InsertionSort | — | O(n²) / O(n) melhor | Sim |
+| InsertionSort | - | O(n²) / O(n) melhor | Sim |
 | MergeSort | Clássico | O(n log n) | Sim |
 | MergeSort | TimSort (Java) | O(n log n) | Sim |
 | QuickSort | Slide (Lomuto) | O(n²) | Não |
 | QuickSort | Slide + Shuffle | O(n log n) esperado | Não |
 | QuickSort | Java Dual-Pivot | O(n log n) | Não |
-| CountingSort | — | O(n + k) | Sim |
+| CountingSort | - | O(n + k) | Sim |
 
 ### Busca
 
@@ -149,15 +153,15 @@ ProjetoEdaLeda/
 
 ### Critério de ordenação de `Estudante`
 
-1. **Nota** — decrescente (maior nota primeiro)
-2. **Nome** — crescente (desempate)
-3. **Matrícula** — crescente (desempate final)
+1. **Nota** - decrescente (maior nota primeiro)
+2. **Nome** - crescente (desempate)
+3. **Matrícula** - crescente (desempate final)
 
 ---
 
 ## Como executar o benchmark
 
-### Opção A — uber-jar (recomendado)
+### Opção A - uber-jar (recomendado)
 
 ```bash
 java -jar target/benchmarks.jar
@@ -165,13 +169,13 @@ java -jar target/benchmarks.jar
 
 Os resultados são salvos automaticamente em `resultados.json` na raiz do projeto.
 
-### Opção B — via Maven
+### Opção B - via Maven
 
 ```bash
 mvn clean package -DskipTests && java -jar target/benchmarks.jar
 ```
 
-### Opção C — filtrar benchmarks específicos
+### Opção C - filtrar benchmarks específicos
 
 Execute apenas um subconjunto de algoritmos passando um padrão regex:
 
@@ -183,6 +187,16 @@ java -jar target/benchmarks.jar "quickSort"
 java -jar target/benchmarks.jar "mergeSort|insertionSort"
 ```
 
+### Benchmark de busca
+
+O projeto tem um benchmark separado para os algoritmos de busca (`SearchBenchmark`). A saída vai para `resultados_busca.json`:
+
+```bash
+java -jar target/benchmarks.jar SearchBenchmark -rf json -rff resultados_busca.json
+```
+
+A busca é sempre por um elemento **ausente** no vetor (pior caso): as buscas lineares percorrem o vetor inteiro (O(n)) e as binárias descem até o fim sem achar (O(log n)). A busca linear recursiva recursa em profundidade O(n); por isso o benchmark já roda a JVM com pilha aumentada (`-Xss512m`), configurado na própria classe, para ela não estourar em vetores grandes.
+
 ---
 
 ## Parâmetros do benchmark
@@ -191,13 +205,19 @@ O JMH executa automaticamente todas as combinações dos parâmetros abaixo:
 
 | Parâmetro | Valores |
 |-----------|---------|
-| `tamanho` | `1000`, `5000`, `10000` |
-| `cenario` | `RANDOM`, `SORTED`, `REVERSED` |
+| `tamanho` | `5000`, `15000`, `50000` |
+| `cenario` | `RANDOM`, `SORTED`, `REVERSED` (apenas na ordenação) |
 
-**Configuração de medição:**
+**Configuração de medição (ordenação):**
 - Aquecimento: 5 iterações × 1 segundo
 - Medição: 15 iterações × 1 segundo
 - Fork: 1 JVM separada por benchmark
+- Unidade de saída: nanosegundos (tempo médio por invocação)
+
+**Configuração de medição (busca):**
+- Aquecimento: 5 iterações × 1 segundo
+- Medição: 10 iterações × 1 segundo
+- Fork: 1 JVM separada por benchmark, com `-Xss512m`
 - Unidade de saída: nanosegundos (tempo médio por invocação)
 
 Cada método de benchmark cria uma **cópia defensiva** do array antes de ordenar, garantindo que a entrada de cada algoritmo seja sempre o cenário original.
@@ -206,13 +226,13 @@ Cada método de benchmark cria uma **cópia defensiva** do array antes de ordena
 
 ## Resultados
 
-Após a execução, o arquivo `resultados.json` contém os dados brutos no formato JMH. Para visualizá-los de forma gráfica, acesse o [JMH Visualizer](https://jmh.morethan.io/) e faça o upload do arquivo.
+Após a execução, os arquivos `resultados.json` (ordenação) e `resultados_busca.json` (busca) contêm os dados brutos no formato JMH. Para visualizá-los de forma gráfica, acesse o [JMH Visualizer](https://jmh.morethan.io/) e faça o upload do arquivo.
 
 Exemplo do formato de saída no terminal:
 
 ```
 Benchmark                         (cenario)  (tamanho)  Mode  Cnt       Score   Error  Units
-SortingBenchmark.bubbleSortSlide     RANDOM       1000  avgt   15   xxxxxxx ± xxxxx  ns/op
-SortingBenchmark.mergeSortClassico   RANDOM       1000  avgt   15   xxxxxxx ± xxxxx  ns/op
+SortingBenchmark.bubbleSortSlide     RANDOM       5000  avgt   15   xxxxxxx ± xxxxx  ns/op
+SortingBenchmark.mergeSortClassico   RANDOM       5000  avgt   15   xxxxxxx ± xxxxx  ns/op
 ...
 ```
