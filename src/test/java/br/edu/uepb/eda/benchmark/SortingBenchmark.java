@@ -59,7 +59,7 @@ public class SortingBenchmark {
      *   gerando combinacoes automaticas com outros @Param. Aqui define os tres
      *   tamanhos de vetor exigidos pelo enunciado.
      */
-    @Param({"1000", "5000", "10000"})
+    @Param({"5000", "15000", "50000"})
     private int tamanho;
 
     /**
